@@ -1,0 +1,104 @@
+{
+  "name": "Geo-tagging",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "41a875e3-19ae-4570-a107-f41f138407cc",
+      "name": "Telegram Trigger",
+      "webhookId": "402e1b47-e7b2-4cf4-84d3-a851cfd0f318",
+      "credentials": {
+        "telegramApi": {
+          "id": "jezSBUM7hVFHtPU7",
+          "name": "SalesBuddy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34bc42ee-7813-46bb-90b8-ec50d5b84899",
+              "name": "userLatitude",
+              "value": "={{ $json.message.location.latitude }}",
+              "type": "string"
+            },
+            {
+              "id": "8bda1bb9-f2e7-4375-9d30-a9bc9d4e9491",
+              "name": "userLongitude",
+              "value": "={{ $json.message.location.longitude }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "0cff3f9b-1847-4bfd-ac7d-8539e08fa5a1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import math\n\n# Assuming input data is in $input (a list of dictionaries)\ninput_data = items[0][\"json\"]\nuser_lat = float(input_data[\"userLatitude\"])\nuser_lon = float(input_data[\"userLongitude\"])\n\n# Your Geofence Center (replace with your actual values)\ngeofence_lat = 12.971660\ngeofence_lon = 77.607033\ngeofence_radius = 20\n\n\n# --- Haversine formula ---\ndef haversine_distance(lat1, lon1, lat2, lon2):\n    R = 6371e3  # Earth's radius in meters\n    phi1 = math.radians(lat1)\n    phi2 = math.radians(lat2)\n    delta_phi = math.radians(lat2 - lat1)\n    delta_lambda = math.radians(lon2 - lon1)\n\n    a = (\n        math.sin(delta_phi / 2) * math.sin(delta_phi / 2)\n        + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2) * math.sin(delta_lambda / 2)\n    )\n    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))\n\n    distance = R * c  # Distance in meters\n    return distance\n\n\n# --- End Haversine formula ---\n\ndistance_to_geofence = haversine_distance(user_lat, user_lon, geofence_lat, geofence_lon)\n\n# Prepare output data\noutput = [\n    {\n        \"json\": {\n            \"userLatitude\": user_lat,\n            \"userLongitude\": user_lon,\n            \"distanceToGeofence\": distance_to_geofence,\n            \"isInsideGeofence\": distance_to_geofence <= geofence_radius,  # Add a boolean flag\n        }\n    }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "e8c3b05b-454b-435c-9c2c-1ddb8d17cf33",
+      "name": "Code"
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

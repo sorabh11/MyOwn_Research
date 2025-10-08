@@ -1,0 +1,1287 @@
+{
+  "name": "Handsfree",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        780,
+        -320
+      ],
+      "id": "8607571d-67ec-4533-83d2-9d143e3fe533",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "tZwI274oKhBlrCZu",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Sales Visit Audio:{{ $json.translatedText }} "
+            },
+            {
+              "content": "**Prompt:**\n* You are an expert data entry operator who analyses input text carefully and then puts them in the right field grounded in the information \n* Please see the transcription of the following sales-visit audio carefully and extract only these details:\n\n* **Retailer Name**\n* **Retailer Contact Person**\n* **Retailer Feedback**\n* **Competitor Feedback**\n* **Date&TimeStamp**\n\n\n**Field Descriptions:**\n\n* **Date&TimeStamp:** Date and timestamp of the time when the audio was submitted for extraction in IST (UTC+05:30) format\n* **Retailer Name:** Name of the store or retail outlet\n* **Retailer Contact Person:** Name of the person the sales rep interacted with\n* **Retailer Feedback:** Retailer’s comments or suggestions on products or service\n* **Competitor Feedback:**Comments or suggestions on Competitor's products or service or activities \n\n**Guidelines:**\n\n* Keep the results grounded in the input message only.\n* Label each field exactly as shown above.\n* Use clear, concise sentences or short bullet points.\n* Keep your entire response under 1500 characters.\n* In case any input is not received, please keep the field empty\n\n**Example Output:**\n\n```\nDate&TimeStamp: 27 May-25 1:04PM\nRetailer Name: Sharma General Store  \nRetailer Contact Person: Rajesh Sharma  \nRetailer Feedback: Customers requesting smaller pack size\nCompetitor Feedback: Competitor giving steep discounts which are leading to loss of sales for key SKU's  \n```\n\n**IMPORTANT**\n* Keep the results grounded in the input message only. * Please don't include any detail from outside the text message received"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 1,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1220,
+        -320
+      ],
+      "id": "74630230-f58a-48c2-9c6f-59f711e8af20",
+      "name": "OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "tZwI274oKhBlrCZu",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -420
+      ],
+      "id": "d9b6fbb8-a3dc-461d-835c-f4a67a2bc0b1",
+      "name": "Telegram Trigger",
+      "webhookId": "840bfc65-39c6-45b0-bd88-f59f18e20ea6",
+      "credentials": {
+        "telegramApi": {
+          "id": "jezSBUM7hVFHtPU7",
+          "name": "SalesBuddy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        560,
+        -320
+      ],
+      "id": "f5d6362f-2daa-4b22-be73-acc3ae80d5c2",
+      "name": "Telegram",
+      "webhookId": "a256421e-7526-462b-8064-b79b28886da7",
+      "credentials": {
+        "telegramApi": {
+          "id": "jezSBUM7hVFHtPU7",
+          "name": "SalesBuddy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "353875d0-84f4-40e0-801f-27b46d1d7fc3",
+              "leftValue": "={{ $json.message.voice }}",
+              "rightValue": "={{ $json.message.voice }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        270,
+        -320
+      ],
+      "id": "0578679c-3975-447f-bd66-20e85bafc24b",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a5348d61-1e0f-4d8c-ac85-74b12d5662f0",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "={{ $json.message.text }}",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -20,
+        -420
+      ],
+      "id": "f136c49a-a87c-4845-9d23-47a742395d24",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Sales Visit Text:  {{ $json.message.text }}"
+            },
+            {
+              "content": "=**Prompt:**\n* You are an expert data entry operator who analyses input text carefully and then puts them in the right field grounded in the information \n* Please see the text from the sales personnel from their sales visit carefully and extract only these details:\n\n* **Retailer Name**\n* **Retailer Contact Person**\n* **Retailer Feedback**\n* **Date&TimeStamp**\n\n**Field Descriptions:**\n\n* **Date&TimeStamp:** Date and timestamp of the time when the audio was submitted for extraction in IST (UTC+05:30) format\n* **Retailer Name:** Name of the store or retail outlet\n* **Retailer Contact Person:** Name of the person the sales rep interacted with\n* **Retailer Feedback:** Retailer’s comments or suggestions on products or service\n\n**Guidelines:**\n\n* Keep the results grounded in the input message only.\n* Label each field exactly as shown above.\n* Use clear, concise sentences or short bullet points.\n* Keep your entire response under 1500 characters.\n\n**Example Output:**\n\n```\nDate&TimeStamp: 27 May-25 1:04PM\nRetailer Name: Sharma General Store  \nRetailer Contact Person: Rajesh Sharma  \nRetailer Feedback: Customers requesting smaller pack size  \n```\n\n**IMPORTANT**\n* Keep the results grounded in the input message only. * Please don't include any detail from outside the text message received"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        200,
+        -520
+      ],
+      "id": "15df5388-da77-435c-af1e-8d10af1fdc19",
+      "name": "OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "tZwI274oKhBlrCZu",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c14f078d-c5ec-426e-a15f-725485adfba2",
+              "name": "message.content['Date&TimeStamp']",
+              "value": "={{ $now.format('dd-MM-yy HH:MM')}}",
+              "type": "string"
+            },
+            {
+              "id": "c122594f-0521-4cc0-b58e-a9821795a6a9",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -520
+      ],
+      "id": "9545d3e0-1215-46f7-82a0-e2ba5818c097",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE",
+          "mode": "list",
+          "cachedResultName": "SalesBuddy_test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Retailer Name": "={{ $json.message.content['Retailer Name'] }}",
+            "Retailer Contact Person ": "={{ $json.message.content['Retailer Contact Person'] }}",
+            "Retailer Feedback": "={{ $json.message.content['Retailer Feedback'] }}",
+            "Date&Timestamp": "={{ $json.message.content['Date&TimeStamp'] }}"
+          },
+          "matchingColumns": [
+            "Retailer Name"
+          ],
+          "schema": [
+            {
+              "id": "Date&Timestamp",
+              "displayName": "Date&Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Name",
+              "displayName": "Retailer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Contact Person ",
+              "displayName": "Retailer Contact Person ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Feedback",
+              "displayName": "Retailer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        -520
+      ],
+      "id": "620836ed-e36b-4727-889b-182da21fa683",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j0oORrH64zoTRWWU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## TO DO\n1. Add extraction \n2. check accuracy in different languages\n3. Ask questions back to Telegram for those that have not been answered\n4. Add Widgets",
+        "height": 220,
+        "width": 280
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1700,
+        -1200
+      ],
+      "id": "75d30c4a-cb84-4482-88ca-aa1e3ba6b215",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c14f078d-c5ec-426e-a15f-725485adfba2",
+              "name": "message.content['Date&TimeStamp']",
+              "value": "={{ $now.format('dd-MM-yy HH:MM')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1580,
+        -320
+      ],
+      "id": "7edc6c32-ccc6-46e0-868c-0ae48f8db8ba",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f1987ed4-7df3-4896-861b-0d7c86c80b4b",
+              "leftValue": "={{ $json.message.content['Retailer Name'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "74422795-f59e-4b70-9775-802bc8fc91d8",
+              "leftValue": "={{ $json.message.content['Retailer Contact Person'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "e6172039-b9bc-4480-ba8c-819d3a097824",
+              "leftValue": "={{ $json.message.content['Retailer Feedback'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "eede7004-8140-44a2-aa1c-3a297882ca37",
+              "leftValue": "={{ $json.message.content['Competitor Feedback'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1800,
+        -320
+      ],
+      "id": "3d7f143f-7451-40f1-a3a0-ba491bb2f202",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Sales Visit Text: {{ $json.message.content }}"
+            },
+            {
+              "content": "=**Prompt:**\nYou are an expert data entry operator. Carefully analyze the input JSON object, and follow these steps:\n\n🔎 **Step 1 – Identify Empty Fields:**\n\n* For each of the following fields, check if its value is an **empty string (\"\")** or missing:\n\n  * Date\\&TimeStamp\n  * Retailer Name\n  * Retailer Contact Person\n  * Retailer Feedback\n* Collect all empty fields in a list.\n* Output a string listing the empty fields in the format:\n\n  * If one field is empty: `\"<field name> is empty\"`\n  * If multiple fields are empty: `\"<field1>, <field2>, and <field3> are empty\"`\n\n📝 **Step 2 – Ask for Missing Information:**\n\n* If only one field is empty, output a polite string:\n\n  * `\"Could you please share the <field name>?\"`\n* If multiple fields are empty, output a polite string:\n\n  * `\"Could you please share the <field1>, <field2>, and <field3>?\"`\n\n**Example Input:**\n\n```json\n{\n  \"Date&TimeStamp\": \"11-06-25 07:06\",\n  \"Retailer Name\": \"\",\n  \"Retailer Contact Person\": \"Rajesh\",\n  \"Retailer Feedback\": \"Rajesh has a problem with the scheme\",\n  \"Competitor Feedback\": \"There is a lot of activity from the competitor brand\"\n}\n```\n\n**Example Output:**\n\n```\n1. Retailer Name is empty  \n2. Could you please share the Retailer Name?\n```\n\n**Important:**\n✅ Only mark a field as empty if its value is an empty string (\"\").\n✅ Do not output any field that has a non-empty value.\n✅ Ignore any extra fields not listed above.\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2020,
+        -320
+      ],
+      "id": "4ded281b-bd72-41c4-ab27-87668a9711b7",
+      "name": "OpenAI4",
+      "credentials": {
+        "openAiApi": {
+          "id": "tZwI274oKhBlrCZu",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE",
+          "mode": "list",
+          "cachedResultName": "SalesBuddy_test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date&Timestamp": "={{ $json.message.content['Date&TimeStamp'] }}",
+            "Retailer Name": "={{ $json.message.content['Retailer Name'] }}",
+            "Retailer Contact Person ": "={{ $json.message.content['Retailer Contact Person'] }}",
+            "Competitor Feedback": "={{ $json.message.content['Competitor Feedback'] }}",
+            "Retailer Feedback": "={{ $json.message.content['Retailer Feedback'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Row ID ",
+              "displayName": "Row ID ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date&Timestamp",
+              "displayName": "Date&Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Retailer Name",
+              "displayName": "Retailer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Retailer Contact Person ",
+              "displayName": "Retailer Contact Person ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Retailer Feedback",
+              "displayName": "Retailer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Competitor Feedback",
+              "displayName": "Competitor Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2090,
+        -520
+      ],
+      "id": "6484f5e8-35f1-4dc3-92fc-d58caabee944",
+      "name": "Google Sheets3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j0oORrH64zoTRWWU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "message": "={{ $json.message.content.request }}",
+        "responseType": "freeText",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2380,
+        -320
+      ],
+      "id": "2505dd1e-fe50-4e83-af74-af52ae3a00d4",
+      "name": "Telegram1",
+      "webhookId": "d4cc2667-4311-4083-a420-7a1a5782c57b",
+      "credentials": {
+        "telegramApi": {
+          "id": "eBd2kKuQ331m8lGg",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE",
+          "mode": "list",
+          "cachedResultName": "SalesBuddy_test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date&Timestamp": "=",
+            "Retailer Name": "={{ $json.message.content['Retailer Name'] }}",
+            "Retailer Contact Person ": "{{ $json.message.content['Retailer Contact Person'] }}",
+            "Retailer Feedback": "{{ $json.message.content['Retailer Feedback'] }}",
+            "Competitor Feedback": "{{ $json.message.content['Competitor Feedback'] }}",
+            "row_number": "={{ $json.row_last }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Row ID ",
+              "displayName": "Row ID ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date&Timestamp",
+              "displayName": "Date&Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Name",
+              "displayName": "Retailer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Contact Person ",
+              "displayName": "Retailer Contact Person ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Retailer Feedback",
+              "displayName": "Retailer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Competitor Feedback",
+              "displayName": "Competitor Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "logprobs",
+              "displayName": "logprobs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "finish_reason",
+              "displayName": "finish_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2960,
+        -320
+      ],
+      "id": "57e2e81a-4c0f-4117-93cb-bdbd9da82b60",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j0oORrH64zoTRWWU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Input of the empty field:{{ $json.data.text }}"
+            },
+            {
+              "content": "**Prompt:**\nYou are an expert data entry operator who analyzes input text carefully and accurately maps the information into the correct structured fields. Do **not make any assumptions** or generate content that is not explicitly present in the input.\n\nPlease review the input message from the sales representative and extract only the clearly mentioned details into the following fields:\n\n* **Retailer Name**\n* **Retailer Contact Person**\n* **Retailer Feedback**\n* **Competitor Feedback**\n\n---\n\n**Field Descriptions:**\n\n* **Retailer Name:** Name of the store or retail outlet.\n* **Retailer Contact Person:** Name of the person the sales rep interacted with.\n* **Retailer Feedback:** Retailer’s comments or suggestions on products or service.\n* **Competitor Feedback:** Comments or suggestions on competitor’s products, service, or activities.\n\n---\n\n**Guidelines:**\n✅ Only include fields that are explicitly and clearly mentioned in the input.\n✅ If a field is **not present, not clearly identifiable**, or **ambiguous**, **do not include it** in the output.\n✅ Always **label each field** exactly as shown above.\n✅ Keep the results **100% grounded in the input text only** — no assumptions, guesses, or completions.\n\n---\n\n**Example Input:**\n\n```\nSharma General Store and Rajesh\n```\n\n**Example Output:**\n\n```\nRetailer Name: Sharma General Store \nRetailer Contact Person: Rajesh \n```\n\n---\n\n**Example Input (Minimal):**\n\n```\nSharma General Store\n```\n\n**Example Output:**\n\n```\nRetailer Name: Sharma General Store  \n```\n\n---\n\n**IMPORTANT:**\n❗ Never infer or fabricate information.\n❗ Do not include any field in the output unless it is **explicitly present** in the input text.\n❗ Keep the format consistent and clean: `Field Name: Value`.\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "temperature": 1,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2600,
+        -320
+      ],
+      "id": "bc27d386-264b-4494-bf47-07aab92ec4a7",
+      "name": "OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "tZwI274oKhBlrCZu",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE",
+          "mode": "list",
+          "cachedResultName": "SalesBuddy_test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit#gid=0"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically",
+              "readRowsUntil": "firstEmptyRow"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2380,
+        -520
+      ],
+      "id": "ce0985c6-1260-4a41-b86c-6abae18d6348",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j0oORrH64zoTRWWU",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "//const lastItem = $input[$input.length - 1];\nreturn {\n  row_last:$input.last().json.row_number\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2670,
+        -520
+      ],
+      "id": "becdb918-2b28-4385-bebc-92142546b99d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "translateTo": "en"
+      },
+      "type": "n8n-nodes-base.googleTranslate",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        -320
+      ],
+      "id": "34f36cf3-e297-44ff-b0fc-93e1a3810af4",
+      "name": "Translate a language",
+      "credentials": {
+        "googleTranslateOAuth2Api": {
+          "id": "7426DaSR5B3v5Ayz",
+          "name": "Google Translate account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE",
+          "mode": "list",
+          "cachedResultName": "SalesBuddy_test 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18fgBU6ef4ZMFU4e3JG1pO9XwdEN4lRBolKLe6HkW7AE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Retailer Name": "={{ $json.message.content['Retailer Name'] }}",
+            "Retailer Contact Person ": "={{ $json.message.content['Retailer Contact Person'] }}",
+            "Retailer Feedback": "={{ $json.message.content['Retailer Feedback'] }}",
+            "Date&Timestamp": "={{ $json.message.content['Date&TimeStamp'] }}",
+            "Competitor Feedback": "={{ $json.message.content['Competitor Feedback'] }}"
+          },
+          "matchingColumns": [
+            "Retailer Name"
+          ],
+          "schema": [
+            {
+              "id": "Date&Timestamp",
+              "displayName": "Date&Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Name",
+              "displayName": "Retailer Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Contact Person ",
+              "displayName": "Retailer Contact Person ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Retailer Feedback",
+              "displayName": "Retailer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Competitor Feedback",
+              "displayName": "Competitor Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "data",
+              "displayName": "data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "index",
+              "displayName": "index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "logprobs",
+              "displayName": "logprobs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "finish_reason",
+              "displayName": "finish_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2090,
+        -120
+      ],
+      "id": "7425df06-b452-4099-9108-490c1223bba9",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "j0oORrH64zoTRWWU",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Append or update row in sheet": [
+      {
+        "json": {
+          "Retailer Name": "Ramesh Electricals",
+          "Retailer Contact Person ": "Ramesh ji",
+          "Retailer Feedback": "Having a lot of problems with our products, defective items are coming",
+          "Date&Timestamp": "13-07-25 18:07",
+          "Competitor Feedback": "Competition is giving a lot of support"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Translate a language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "OpenAI2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "OpenAI4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI4": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "OpenAI3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate a language": {
+      "main": [
+        [
+          {
+            "node": "OpenAI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "6af10061-2b60-4a9c-bc17-54caf934729d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39e9c01a2593b60176cdd2d00be53f2e0050f53645e1b6f9eb05581d48e18abf"
+  },
+  "id": "ZC3cc9NlRryZ270c",
+  "tags": []
+}
