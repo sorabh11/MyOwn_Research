@@ -1,6 +1,6 @@
-# CLAUDE.md
+# MyOwn_Research
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+A personal knowledge and resource repository with automated documentation systems for research content organization and analysis.
 
 ## Repository Overview
 
@@ -40,3 +40,29 @@ This repository contains primarily PDFs and JSON files. When asked to analyze or
 - Research documents focus on SFA market analysis for Indian SMBs
 - n8n workflow JSONs contain node configurations and automation logic
 - Reference materials cover AI/ML topics and programming fundamentals
+
+## Key Resources
+
+### 📊 ResearchNotes.md
+A comprehensive overview of all research content, automatically generated and regularly updated. Perfect for quickly understanding what research materials are available.
+
+### 🤖 Research Automation
+The repository includes a Python script that automatically generates research summaries from PDFs and documents. Run `python3 generate_research_notes.py` to update summaries after adding new files.
+
+## Getting Started
+
+1. **Browse Research:** Start with `ResearchNotes.md` for an overview of all research content
+2. **Explore Categories:** Navigate through the organized folder structure 
+3. **Use Workflows:** Import n8n workflow JSON files for automation projects
+4. **Update Summaries:** Run the research generator script when adding new files
+
+## Recent Updates
+
+**October 2025**
+- Added automated research documentation system
+- Generated comprehensive research summaries 
+- Implemented process for keeping content easily accessible
+
+---
+
+*This repository serves as a centralized knowledge base for business research, automation workflows, and learning resources.*
