@@ -20,9 +20,15 @@ flowchart TD
     TextInput --> Process[Process Input]
     Transcribe --> Process
 
-    Process --> RAG[RAG Pipeline:<br/>Vector Search + LLM Classification]
+    Process --> RAG[RAG Pipeline:<br/>Vector Search + LLM Classification<br/>+ Domain-Aware Causality Detection]
 
-    RAG --> Confidence{Confidence Score?}
+    RAG --> CausalityCheck{Top 4 Buckets?<br/>Payment/Stock/Pricing/Competitor}
+
+    CausalityCheck -->|Yes| ApplyCausality[Apply Business Model Logic:<br/>Detect causal relationships<br/>Identify root cause vs symptom]
+    CausalityCheck -->|No| StandardMatch[Standard Keyword/Semantic Matching]
+
+    ApplyCausality --> Confidence{Confidence Score?}
+    StandardMatch --> Confidence
 
     Confidence -->|>80% High| AutoSelect[Auto-select Bucket]
     Confidence -->|60-80% Medium| ShowTop2[Show Top 2 Buckets<br/>for Confirmation]
@@ -63,6 +69,60 @@ flowchart TD
     style Record fill:#e3f2fd
     style Store fill:#e3f2fd
 ```
+
+---
+
+## 🧠 Domain-Aware Causality Logic (New Addition)
+
+The flowchart now includes **causality detection** for the top 4 buckets (Payment, Stock, Pricing, Competitor) that account for 50-60% of rejections.
+
+### How It Works
+
+**Step 1: RAG Pipeline**
+- Voice-to-text transcription + translation
+- Vector search against knowledge base
+- LLM classification with GPT-3.5-turbo
+
+**Step 2: Causality Check**
+- System checks if input maps to top 4 interrelated buckets
+- If YES → Apply domain-aware business logic
+- If NO → Use standard keyword/semantic matching
+
+**Step 3: Business Model Logic (for Top 4 Buckets)**
+The system understands the FMCG distribution working capital cycle:
+
+```
+Stock not selling → Capital locked → Payment delayed
+
+High pricing → Demand suppressed → Stock accumulates
+
+Competitor pressure → Margin squeeze OR pricing pressure
+```
+
+**Examples:**
+
+✅ **Input:** "Payment pending hai aur stock bhi pada hai"
+- **Standard approach:** Payment Issues (treats symptom)
+- **Domain-aware approach:** Slow Moving Stock (identifies root cause)
+- **Reasoning:** Stock blocking capital → Payment delayed
+
+✅ **Input:** "Stock nahi bik raha kyunki price zyada hai"
+- **Classification:** Pricing Concerns (root cause)
+- **Secondary tag:** Stock accumulation consequence
+- **Reasoning:** Explicit "kyunki" (because) marker + pricing suppresses demand
+
+✅ **Input:** "Delivery late hai" (Bucket #5)
+- **Classification:** Delivery Issues (standard matching)
+- **No causality logic needed:** Independent operational issue
+
+### Key Innovation
+
+**Root Cause vs Symptom Detection:**
+- 85-90% of cases: Auto-classified with high confidence
+- 15% of cases: Brief clarification question asked
+- Enables actionable brand intelligence (fix root causes, not symptoms)
+
+**Cost:** $0.001 per classification (~$3/month for 100/day) using GPT-3.5-turbo + prompt caching
 
 ---
 
